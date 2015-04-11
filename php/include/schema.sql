@@ -1124,8 +1124,8 @@ CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT, IN the_sys
 BEGIN
 	START TRANSACTION;
 /* create the character */
-	INSERT INTO characters (`name`, `system`, `stats`, `color`)
-		VALUES (the_name, the_system, '[]', 'gray');
+	INSERT INTO characters (`name`, `system`, `stats`, `notes`, `portrait`, `piece`, `color`)
+		VALUES (the_name, the_system, '[]', '', '{}', '{}', 'gray');
 	SET @id = LAST_INSERT_ID();
 /* make this user the character's owner */
 	INSERT INTO character_owners (`user`, `character`)

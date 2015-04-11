@@ -39,10 +39,11 @@ $(function () { // This anonymous function runs after the page loads.
 		LT.saveCharacterSettings();
 	});
 	$("#changePortraitURL").click(function () {
-		var url = prompt("new external image URL", LT.currentCharacter.portrait || "");
-		if (url != null && url != LT.currentCharacter.portrait) {
-			LT.currentCharacter.portrait = url;
-			$("#portraitURL").text(url || "");
+		var oldURL = LT.currentCharacter.portrait.url;
+		var newURL = prompt("new external image URL", oldURL || "");
+		if (newURL != null && newURL != oldURL) {
+			LT.currentCharacter.portrait = {"url": newURL};
+			$("#portraitURL").text(newURL);
 			LT.saveCharacterSettings();
 		}
 	});
@@ -114,10 +115,10 @@ LT.saveCharacterSettings = function () {
 		"character": LT.currentCharacter.id,
 		"name": LT.currentCharacter.name,
 		"system": LT.currentCharacter.system,
-		"stats": LT.currentCharacter.stats,
+		"stats": JSON.stringify(LT.currentCharacter.stats),
 		"notes": LT.currentCharacter.notes,
-		"portrait": LT.currentCharacter.portrait,
-		"piece": LT.currentCharacter.piece,
+		"portrait": JSON.stringify(LT.currentCharacter.portrait),
+		"piece": JSON.stringify(LT.currentCharacter.piece),
 		"color": LT.currentCharacter.color,
 	}, LT.refreshCharacterList);
 };
@@ -132,7 +133,7 @@ LT.readPortraitImages = function (portraitImageData) {
 			}).addClass("swatch").click(function () {
 				$("#selectPortrait *").removeClass("selected");
 				$(this).addClass("selected");
-				LT.currentCharacter.portrait = image.file;
+				LT.currentCharacter.portrait = {"file": image.file};
 				LT.saveCharacterSettings();
 			});
 		});
@@ -188,7 +189,10 @@ LT.showCharacterInfo = function (character) {
 	// character info tab
 	$("#characterName").text(character.name || "[unnamed character]");
 	$("#system").val(character.system);
-	$("#portrait").css("background-image", character.portrait);
+	var portraitURL = character.portrait.url;
+	if (character.portrait.file)
+		portraitURL = "images/" + character.portrait.file;
+	$("#portrait").css("background-image", "url(" + portraitURL + ")");
 	// TODO: select current portrait if it is not an external url
 	// TODO: character pieces
 

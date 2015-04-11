@@ -13,6 +13,6 @@ if (!isset($_SESSION['user'])) {
 if (is_array($rows = LT_call('read_characters', intval($_SESSION['user']))))
 	LT_output_array($rows, array(
 		'integer' => array('id'),
-		'json' => array('stats', 'notes', 'portrait', 'piece')));
+		'json' => array('stats', 'portrait', 'piece')));
 
 ?>
