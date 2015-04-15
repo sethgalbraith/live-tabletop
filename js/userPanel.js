@@ -50,12 +50,12 @@ $(function () { // This anonymous function runs after the page loads.
 			box.disabled = false;
 		});
 	});
-	$("#userName input[type=button]").click(function () {
+	$("#renameUser").click(function () {
 		var newName = prompt("new user name", LT.currentUser.name || "");
 		if (newName != null && newName != LT.currentUser.name) {
 			LT.currentUser.name = newName;
 			$.post("php/User.settings.php", LT.currentUser, function () {
-				$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
+				$("#userName").text(LT.currentUser.name || LT.currentUser.email);
 			});
 		}
 	});

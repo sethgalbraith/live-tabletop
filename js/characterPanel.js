@@ -11,6 +11,10 @@ $(function () { // This anonymous function runs after the page loads.
 					- $("#createCharacter").width() - LT.GUTTERS - 7 + "px");
 				$(".characterListRow").width(width - $(".disownCharacter:visible").width() - LT.GUTTERS);
 				break;
+			case "characterUsers":
+				$("#newCharacterUser").css("max-width", width - $("#shareCharacter").width() - LT.GUTTERS + "px");
+				$("#characterUsers .name").width(width - $("#characterUsers .remove:visible").width() - LT.GUTTERS);
+				break;
 		}
 	};
 
@@ -52,20 +56,15 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#shareCharacter").click(function () {
 		$.post("php/Character.share.php", {
 			"character": LT.currentCharacter.id,
-			"user": $("#newCharacterOwner").val(),
+			"user": $("#newCharacterUser").val(),
 		}, LT.refreshCharacterList);
 	});
 
 	// character stats tab
 	$("#addStat").click(function () {
 		LT.currentCharacter.stats.push({"name": "", "value": ""});
-		LT.showStats();
-	});
-	$("#saveStats").click(function () {
-		// TODO: should we store the stats in a buffer
-		// so they aren't saved when you change other character properties?
-		// or should we 
 		LT.saveCharacterSettings();
+		LT.showStats(); // immediate feedback
 	});
 
 	// character notes tab
@@ -196,7 +195,35 @@ LT.showCharacterInfo = function (character) {
 	// TODO: select current portrait if it is not an external url
 	// TODO: character pieces
 
-	// TODO: character users tab
+	// character users tab
+	$.get("php/Character.owners.php", {
+		"character": character.id
+	}, function (theOwners) {
+		$("#characterUsers > :not(.template)").remove();
+		$.each(theOwners, function (i, owner) {
+			var row = $("#characterUsers .template").clone().removeClass("template");
+			row.find(".name").text(owner.name || "[unnamed user]");
+			row.find(".remove").click(function () {
+				if (theOwners.length == 1) {
+					if (!confirm("This will delete the character. Are you sure you want to do that?"))
+						return;
+				} else if (owner.id == LT.currentUser.id) {
+					if (!confirm("Are you sure you want to disown this character?"))
+						return;
+				} else {
+					if (!confirm("Are you sure you want to revoke "
+						+ (owner.name || "this user")
+						+ "'s permission to use this character?"))
+						return;
+				}
+				$.post("php/Character.deleteOwner.php", {
+					character: character.id,
+					user: owner.id,
+				}, LT.showCharacterInfo);
+			});
+			row.appendTo("#characterUsers");
+		});			
+	});
 
 	// update character stats tab only if the stats are not being edited
 	if (LT.characterPanel.getTab() != "character stats")
@@ -212,11 +239,20 @@ LT.showStats = function () {
 	$("#stats > :not(.template)").remove();
 	$.each(LT.currentCharacter.stats, function (i, stat) {
 		var row = $("#stats .template").clone().removeClass("template");
-		row.find(".name").text(stat.name);
-		row.find(".value").text(stat.value);
+		row.find(".name").val(stat.name).change(function () {
+			LT.currentCharacter.stats[i].name = $(this).val();
+			LT.saveCharacterSettings();
+			LT.showStats(); // immediate feedback
+		});
+		row.find(".value").val(stat.value).change(function () {
+			LT.currentCharacter.stats[i].value = $(this).val();
+			LT.saveCharacterSettings();
+			LT.showStats(); // immediate feedback
+		});
 		row.find(".remove").click(function () {
 			LT.currentCharacter.stats.splice(i, 1); // remove this stat
-			LT.showStats();
+			LT.saveCharacterSettings();
+			LT.showStats(); // immediate feedback
 		});
 		row.appendTo("#stats");		
 	});

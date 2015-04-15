@@ -730,16 +730,14 @@
 			</div>
 			<div class="content" data-tab="character users">
 				<div>
-					<select id="newCharacterUser"><option>Player 3</option></select>
+					<select name="user" id="newCharacterUser"><option>Player 3</option></select>
 					<input id="shareCharacter" type="button" value="add owner"/>
 				</div>
 				<div id="characterUsers">
-					<div><span class="ellipsis"><a>Player 1</a> </span><input type="button" value="remove"/></div>
-					<div><span class="ellipsis"><a>Player 2</a> </span><input type="button" value="remove"/></div>
+					<div class="template"><span class="ellipsis name">Player 1</span><input class="remove" type="button" value="remove"/></div>
 				</div>
 			</div>
 			<div class="content" data-tab="character stats">
-				<div>Changes are not saved or shared with other users until you click save changes below.</div>
 				<div id="stats">
 					<div class="template">
 						<input type="text" class="name" value=""/>
@@ -749,7 +747,6 @@
 				</div>
 				<div>
 					<input id="addStat" type="button" value="add stat"/>
-					<input id="saveStats" type="button" value="save changes"/>
 				</div>
 			</div>
 			<div class="content" data-tab="character notes">
